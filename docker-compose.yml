@@ -1,0 +1,31 @@
+# DayLog — Docker deployment.
+# MongoDB is external (Atlas): set MONGODB_URL in .env (it is NOT a service here).
+# Usage:  cp .env.example .env  &&  edit .env  &&  docker compose up -d --build
+
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL in .env}
+      DB_NAME: ${DB_NAME:-daylog}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health').getcode()==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"

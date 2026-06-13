@@ -1,0 +1,14 @@
+# FastAPI web framework + ASGI server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+
+# Async MongoDB driver (brings in pymongo + bson)
+motor>=3.5.0
+
+# Data validation & settings
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+
+# Authentication: JWT tokens + password hashing
+PyJWT>=2.9.0
+bcrypt>=4.2.0
